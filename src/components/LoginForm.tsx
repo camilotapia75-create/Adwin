@@ -1,30 +1,31 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { loginAction } from "@/app/actions/auth";
 
-function LoginFormInner() {
-  const searchParams = useSearchParams();
-  const errorParam = searchParams.get("error");
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await signIn("credentials", { email, password, callbackUrl: "/" });
-    setLoading(false);
+    setError("");
+    const result = await loginAction(email, password);
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    }
   }
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sign In</h2>
-      {errorParam && (
+      {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-          Invalid email or password
+          {error}
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,13 +43,5 @@ function LoginFormInner() {
       </form>
       <p className="text-center text-sm text-gray-600 mt-6">Don&apos;t have an account? <Link href="/register" className="text-purple-600 font-semibold hover:text-purple-800">Sign up free</Link></p>
     </div>
-  );
-}
-
-export default function LoginForm() {
-  return (
-    <Suspense>
-      <LoginFormInner />
-    </Suspense>
   );
 }

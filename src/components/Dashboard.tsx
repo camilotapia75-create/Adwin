@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { signOut } from "next-auth/react";
+import { signOutAction } from "@/app/actions/auth";
 import type { Session } from "next-auth";
 import AdWatcher from "@/components/AdWatcher";
 import StatsCard from "@/components/StatsCard";
@@ -66,7 +66,9 @@ export default function Dashboard({ session }: { session: Session }) {
         {stats && stats.recentWins.length > 0 && <WinHistory wins={stats.recentWins} />}
         {stats && stats.recentDraws.length > 0 && <LotteryDraws draws={stats.recentDraws} />}
         {isAdmin && <div className="text-center mb-4"><a href="/admin" className="text-white/80 underline text-sm hover:text-white">Admin Panel</a></div>}
-        <div className="text-center"><button onClick={() => signOut({ callbackUrl: "/login" })} className="text-white/70 underline text-sm hover:text-white transition-colors">Sign Out</button></div>
+        <div className="text-center">
+          <button onClick={() => signOutAction()} className="text-white/70 underline text-sm hover:text-white transition-colors">Sign Out</button>
+        </div>
       </div>
     </div>
   );
