@@ -1,11 +1,8 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function RegisterForm() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,14 +14,32 @@ export default function RegisterForm() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, password }) });
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || "Registration failed"); return; }
-      const result = await signIn("credentials", { email, password, redirect: false });
-      if (result?.error) { setError("Registered but failed to sign in. Please log in manually."); router.push("/login"); }
-      else { router.push("/"); router.refresh(); }
-    } catch { setError("Something went wrong. Please try again."); }
-    finally { setLoading(false); }
+      if (!res.ok) {
+        setError(data.error || "Registration failed");
+        setLoading(false);
+        return;
+      }
+      // Auto sign-in after registration
+      const loginRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (loginRes.ok) {
+        window.location.href = "/";
+      } else {
+        window.location.href = "/login";
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
