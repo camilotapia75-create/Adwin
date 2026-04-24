@@ -1,11 +1,8 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,11 +13,22 @@ export default function LoginForm() {
     setError("");
     setLoading(true);
     try {
-      const result = await signIn("credentials", { email, password, redirect: false });
-      if (result?.error) setError("Invalid email or password");
-      else { router.push("/"); router.refresh(); }
-    } catch { setError("Something went wrong. Please try again."); }
-    finally { setLoading(false); }
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Invalid email or password");
+        setLoading(false);
+        return;
+      }
+      window.location.href = "/";
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
