@@ -56,7 +56,13 @@ export default function Dashboard({ session }: { session: AppSession }) {
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white text-center"><div className="text-2xl font-bold">{stats.totalWins}</div><div className="text-sm text-white/70">Total Wins</div></div>
           </div>
         )}
-        <AdWatcher watchedToday={stats?.watchedToday ?? false} poolDrawn={stats?.poolDrawn ?? false} onAdWatched={handleAdWatched} loading={loading} />
+        <AdWatcher
+          watchedToday={stats?.watchedToday ?? false}
+          poolDrawn={stats?.poolDrawn ?? false}
+          onAdWatched={handleAdWatched}
+          loading={loading}
+          userId={session.user.id}
+        />
         <div className="bg-white rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-800 text-center mb-6">How It Works</h2>
           <div className="grid grid-cols-3 gap-4 text-center">
