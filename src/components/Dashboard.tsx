@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { AppSession } from "@/lib/auth";
 import AdWatcher from "@/components/AdWatcher";
+import GoogleAdUnit from "@/components/GoogleAdUnit";
 import StatsCard from "@/components/StatsCard";
 import WinHistory from "@/components/WinHistory";
 import LotteryDraws from "@/components/LotteryDraws";
@@ -64,6 +65,7 @@ export default function Dashboard({ session }: { session: AppSession }) {
           loading={loading}
           userId={session.user.id}
         />
+        <GoogleAdUnit />
         <div className="bg-white rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-800 text-center mb-6">How It Works</h2>
           <div className="grid grid-cols-3 gap-4 text-center">
