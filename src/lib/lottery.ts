@@ -1,7 +1,24 @@
 import { prisma } from "@/lib/prisma";
 
+// Set DAILY_AD_LIMIT in Vercel env vars to change the cap (default 10)
+export const DAILY_AD_LIMIT = parseInt(process.env.DAILY_AD_LIMIT ?? "10");
+
 export function getTodayDate(): string {
   return new Date().toISOString().split("T")[0];
+}
+
+export async function getAdViewsToday(userId: string, date: string): Promise<number> {
+  return prisma.adView.count({ where: { userId, date } });
+}
+
+export async function hasWatchedAdToday(userId: string, date: string): Promise<boolean> {
+  const count = await getAdViewsToday(userId, date);
+  return count > 0;
+}
+
+export async function hasReachedDailyLimit(userId: string, date: string): Promise<boolean> {
+  const count = await getAdViewsToday(userId, date);
+  return count >= DAILY_AD_LIMIT;
 }
 
 export async function addToPool(date: string, revenue: number) {
@@ -10,11 +27,6 @@ export async function addToPool(date: string, revenue: number) {
     update: { totalPool: { increment: revenue }, viewCount: { increment: 1 } },
     create: { date, totalPool: revenue, viewCount: 1 },
   });
-}
-
-export async function hasWatchedAdToday(userId: string, date: string): Promise<boolean> {
-  const view = await prisma.adView.findUnique({ where: { userId_date: { userId, date } } });
-  return !!view;
 }
 
 export async function drawLottery(date: string) {

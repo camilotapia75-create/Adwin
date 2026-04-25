@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getTodayDate, hasWatchedAdToday, addToPool } from "@/lib/lottery";
+import { getTodayDate, hasReachedDailyLimit, addToPool, DAILY_AD_LIMIT } from "@/lib/lottery";
 
-// Set AD_REVENUE_PER_VIEW in Vercel env vars to match your actual ad network payout.
-// Google IMA completed video views typically pay $0.01–$0.05 per view.
 const AD_REVENUE_PER_VIEW = parseFloat(process.env.AD_REVENUE_PER_VIEW ?? "0.001");
 
 export async function POST() {
@@ -13,13 +11,13 @@ export async function POST() {
   const userId = session.user.id;
   const today = getTodayDate();
   try {
-    const alreadyWatched = await hasWatchedAdToday(userId, today);
-    if (alreadyWatched) return NextResponse.json({ error: "You have already watched an ad today. Come back tomorrow!" }, { status: 400 });
+    const reachedLimit = await hasReachedDailyLimit(userId, today);
+    if (reachedLimit) return NextResponse.json({ error: `You've watched all ${DAILY_AD_LIMIT} ads for today. Come back tomorrow!` }, { status: 400 });
     const adView = await prisma.adView.create({ data: { userId, date: today, adRevenue: AD_REVENUE_PER_VIEW } });
     await prisma.lotteryEntry.create({ data: { userId, adViewId: adView.id, date: today } });
     await addToPool(today, AD_REVENUE_PER_VIEW);
     const pool = await prisma.dailyPool.findUnique({ where: { date: today } });
-    return NextResponse.json({ success: true, message: "Ad watched! You're entered in today's lottery.", pool: pool?.totalPool ?? 0, viewCount: pool?.viewCount ?? 0 });
+    return NextResponse.json({ success: true, pool: pool?.totalPool ?? 0, viewCount: pool?.viewCount ?? 0 });
   } catch (error) {
     console.error("Error recording ad view:", error);
     return NextResponse.json({ error: "Failed to record ad view" }, { status: 500 });

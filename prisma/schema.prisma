@@ -69,24 +69,20 @@ model AdView {
   date      String
   adRevenue Float    @default(0.001)
 
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lotteryEntry  LotteryEntry?
-
-  @@unique([userId, date])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lotteryEntry LotteryEntry?
 }
 
 model LotteryEntry {
-  id          String   @id @default(cuid())
-  userId      String
-  adViewId    String   @unique
-  date        String
-  enteredAt   DateTime @default(now())
-  isWinner    Boolean  @default(false)
+  id        String   @id @default(cuid())
+  userId    String
+  adViewId  String   @unique
+  date      String
+  enteredAt DateTime @default(now())
+  isWinner  Boolean  @default(false)
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  adView  AdView  @relation(fields: [adViewId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, date])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adView AdView @relation(fields: [adViewId], references: [id], onDelete: Cascade)
 }
 
 model LotteryDraw {

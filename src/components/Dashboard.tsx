@@ -8,8 +8,8 @@ import LotteryDraws from "@/components/LotteryDraws";
 import Confetti from "@/components/Confetti";
 
 interface Stats {
-  todayPool: number; watchersToday: number; watchedToday: boolean; poolDrawn: boolean;
-  userEarnings: number; totalEntries: number; totalWins: number;
+  todayPool: number; watchersToday: number; adsWatchedToday: number; dailyLimit: number;
+  poolDrawn: boolean; userEarnings: number; totalEntries: number; totalWins: number;
   recentWins: Array<{ id: string; amount: number; date: string; createdAt: string }>;
   recentDraws: Array<{ id: string; date: string; totalPool: number; winnersCount: number; prizePerWinner: number }>;
 }
@@ -57,7 +57,8 @@ export default function Dashboard({ session }: { session: AppSession }) {
           </div>
         )}
         <AdWatcher
-          watchedToday={stats?.watchedToday ?? false}
+          adsWatchedToday={stats?.adsWatchedToday ?? 0}
+          dailyLimit={stats?.dailyLimit ?? 10}
           poolDrawn={stats?.poolDrawn ?? false}
           onAdWatched={handleAdWatched}
           loading={loading}
@@ -66,9 +67,9 @@ export default function Dashboard({ session }: { session: AppSession }) {
         <div className="bg-white rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-800 text-center mb-6">How It Works</h2>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div><div className="text-4xl mb-3">📺</div><div className="font-semibold text-gray-800 mb-1">1. Watch Ad</div><div className="text-sm text-gray-500">Watch one video ad per day</div></div>
-            <div><div className="text-4xl mb-3">🏟️</div><div className="font-semibold text-gray-800 mb-1">2. Get Entry</div><div className="text-sm text-gray-500">You&apos;re entered into today&apos;s lottery</div></div>
-            <div><div className="text-4xl mb-3">💸</div><div className="font-semibold text-gray-800 mb-1">3. Win Money</div><div className="text-sm text-gray-500">Random winners split the ad revenue</div></div>
+            <div><div className="text-4xl mb-3">📺</div><div className="font-semibold text-gray-800 mb-1">1. Watch Ads</div><div className="text-sm text-gray-500">Up to 10 video ads per day</div></div>
+            <div><div className="text-4xl mb-3">🏟️</div><div className="font-semibold text-gray-800 mb-1">2. Get Entries</div><div className="text-sm text-gray-500">Each ad = one lottery entry</div></div>
+            <div><div className="text-4xl mb-3">💸</div><div className="font-semibold text-gray-800 mb-1">3. Win Money</div><div className="text-sm text-gray-500">Random winners split the revenue</div></div>
           </div>
         </div>
         {stats && stats.recentWins.length > 0 && <WinHistory wins={stats.recentWins} />}
