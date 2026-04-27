@@ -86,7 +86,7 @@ model LotteryEntry {
   isWinner  Boolean  @default(false)
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  adView AdView? @relation(fields: [adViewId], references: [id], onDelete: Cascade)
+  adView AdView? @relation(fields: [adViewId], references: [id], onDelete: SetNull)
 }
 
 model LotteryDraw {
